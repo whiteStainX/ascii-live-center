@@ -1,17 +1,44 @@
 package frames
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type FrameType struct {
-	GetFrame  func(int) string
+	GetFrame  func(int, int) string
 	GetLength func() int
 	GetSleep  func() time.Duration
 }
 
 // Create a function that returns the next frame, based on length
-func DefaultGetFrame(frames []string) func(int) string {
-	return func(i int) string {
-		return frames[i%(len(frames))]
+func DefaultGetFrame(frames []string) func(int, int) string {
+	return func(i int, terminalWidth int) string {
+		frame := frames[i%(len(frames))]
+		lines := strings.Split(frame, "\n")
+		maxWidth := 0
+		for _, line := range lines {
+			if len(line) > maxWidth {
+				maxWidth = len(line)
+			}
+		}
+
+		padding := (terminalWidth - maxWidth) / 2
+		if padding < 0 {
+			padding = 0
+		}
+		pad := strings.Repeat(" ", padding)
+
+		var centeredFrame strings.Builder
+		for j, line := range lines {
+			centeredFrame.WriteString(pad)
+			centeredFrame.WriteString(line)
+			if j < len(lines)-1 {
+				centeredFrame.WriteString("\n")
+			}
+		}
+
+		return centeredFrame.String()
 	}
 }
 

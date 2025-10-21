@@ -10,6 +10,8 @@ import (
 
 	"github.com/hugomd/ascii-live/frames"
 
+	"strconv"
+
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 )
@@ -93,8 +95,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			clearScreen := "\033[2J\033[H"
 			newLine := "\n"
 
+			// Get terminal width from query param
+			widthStr := r.URL.Query().Get("cols")
+			width, err := strconv.Atoi(widthStr)
+			if err != nil {
+				// Fallback to a default width
+				width = 80
+			}
+
 			// Write frames
-			fmt.Fprint(w, clearScreen+frames.GetFrame(i)+newLine)
+			fmt.Fprint(w, clearScreen+frames.GetFrame(i, width)+newLine)
 			i++
 
 			// Send some data.

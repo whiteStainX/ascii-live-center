@@ -9,6 +9,11 @@ Try it out in your terminal:
 curl ascii.live/parrot
 ```
 
+To specify the width of the animation, you can add the `cols` query parameter to the URL. The `tput cols` command can be unreliable, so we recommend using `stty size` instead:
+```bash
+curl "ascii.live/parrot?cols=$(stty size | cut -d' ' -f2)"
+```
+
 <img src="./demo.gif" width="400"/>
 
 ## Running locally
