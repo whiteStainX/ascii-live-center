@@ -1,6 +1,9 @@
 package frames
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 var Clock = FrameType{
 	GetFrame:  getClockFrame,
@@ -8,9 +11,14 @@ var Clock = FrameType{
 	GetSleep:  DefaultGetSleep(),
 }
 
-func getClockFrame(i int) string {
+func getClockFrame(i int, terminalWidth int) string {
 	t := time.Now().Format(time.RFC3339)
-	return t
+	padding := (terminalWidth - len(t)) / 2
+	if padding < 0 {
+		padding = 0
+	}
+	pad := strings.Repeat(" ", padding)
+	return pad + t
 }
 
 func getClockLength() int {

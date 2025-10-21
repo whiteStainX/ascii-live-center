@@ -10,9 +10,29 @@ import (
 
 	"github.com/hugomd/ascii-live/frames"
 
+	"os/exec"
+	"strconv"
+
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 )
+
+func getTerminalWidth() (int, error) {
+	cmd := exec.Command("stty", "size")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, err
+	}
+	parts := strings.Split(strings.TrimSpace(string(output)), " ")
+	if len(parts) != 2 {
+		return 0, fmt.Errorf("unexpected output from stty size: %s", output)
+	}
+	width, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, err
+	}
+	return width, nil
+}
 
 var NotFoundMessage = map[string]string{
 	"error": "Frames not found. Navigate to /list for list of frames. Navigate to https://github.com/hugomd/ascii-live to submit new frames.",
@@ -93,8 +113,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			clearScreen := "\033[2J\033[H"
 			newLine := "\n"
 
+			// Get terminal width
+			width, err := getTerminalWidth()
+			if err != nil {
+				// Fallback to a default width
+				width = 80
+			}
 			// Write frames
-			fmt.Fprint(w, clearScreen+frames.GetFrame(i)+newLine)
+			fmt.Fprint(w, clearScreen+frames.GetFrame(i, width)+newLine)
 			i++
 
 			// Send some data.
