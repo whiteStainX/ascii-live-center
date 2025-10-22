@@ -85,10 +85,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			glog.Infof("Client stopped listening")
 			return
 		default:
-			if i >= frames.GetLength() {
-				i = 0
-			}
-			// Artificially wait between reponses.
+					if i >= frames.GetLength() {
+						if *once {
+							return
+						}
+						i = 0
+					}			// Artificially wait between reponses.
 			time.Sleep(frames.GetSleep())
 
 			// Clear screen
@@ -114,6 +116,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Server.
+var once = flag.Bool("once", false, "Play animation once and exit")
+
 func main() {
 	flag.Parse()
 	// Don't write to /tmp - doesn't work in docker scratch

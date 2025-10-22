@@ -22,6 +22,11 @@ To run the server locally on port `8080`, run:
 go run main.go
 ```
 
+To run the server locally and only run the animation once:
+```bash
+go run main.go -once
+```
+
 ## Running in Docker
 ```bash
 docker run -p 8080:8080 hugomd/ascii-live:latest
